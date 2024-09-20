@@ -1,0 +1,59 @@
+#version: '3'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    volumes:
+      - ./backend:/app
+      - ../common/backend/m2:/root/.m2
+    working_dir: /app
+    command: sh run.sh
+    ports:
+      - 28003:8080
+      - 35729:35729
+      - 5005:5005
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://if012estm.fi.mdn.unp.edu.ar:28001/ddbb1
+      - SPRING_DATASOURCE_USERNAME=dbuser
+      - SPRING_DATASOURCE_PASSWORD=m1&p5swd
+    networks:
+      - app_net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    working_dir: /home/node/cli
+    command: ng serve --host 0.0.0.0
+    restart: always
+    ports:
+      - "28002:4200"
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./frontend:/home/node
+    depends_on: 
+      - backend
+    networks:
+      - app_net
+
+  testing:
+    image: node:alpine
+    container_name: testing
+    profiles:
+      - test
+    working_dir: /home/node
+    volumes:
+      - ./testing:/home/node
+      - ../common/testing/node_modules:/home/node/node_modules      
+    command: npm test
+    networks:
+      - app_net
+
+networks:
+  app_net:
+    driver: bridge

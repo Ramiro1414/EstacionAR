@@ -1,0 +1,27 @@
+<div class="background-image" [class.loading]="loading"></div>
+<div *ngIf="loading" class="loading-overlay">
+    <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
+
+<div class="header">
+    <div class="logo">
+        <a href class="logo-link">
+            <h3>EstacionAR</h3>
+        </a>
+    </div>
+
+    <div class="vertical-line"></div>
+    <div>
+        <a href="map">
+            <button class="btn btn-gantt">Mostrar mapa</button>
+        </a>
+    </div>
+    <div class="vertical-line"></div>
+
+</div>
+
+<div class="container white-div">
+    <router-outlet></router-outlet>
+</div>
