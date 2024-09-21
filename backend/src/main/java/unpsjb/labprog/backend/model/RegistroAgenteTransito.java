@@ -31,4 +31,12 @@ public class RegistroAgenteTransito {
 
     @Column(columnDefinition = "BYTEA")
     private byte[] fotografia;
+
+    public String getPatente() {
+        return this.patente;
+    }
+
+    public Timestamp getHoraRegistro() {
+        return this.horaRegistro;
+    }
 }

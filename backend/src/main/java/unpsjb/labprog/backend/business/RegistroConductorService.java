@@ -1,6 +1,7 @@
 package unpsjb.labprog.backend.business;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,17 @@ public class RegistroConductorService {
     public List<RegistroConductor> findAll(){
         List<RegistroConductor> result = new ArrayList<>();
         repository.findAll().forEach(e -> result.add(e));
+        return result;
+    }
+
+    public List<RegistroConductor> findAllOrderByPatenteAsc() {
+        
+        List<RegistroConductor> result = new ArrayList<>();
+        
+        repository.findAll().forEach(result::add);
+        
+        result.sort(Comparator.comparing(RegistroConductor::getPatente));
+    
         return result;
     }
 

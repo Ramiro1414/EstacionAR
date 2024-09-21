@@ -25,4 +25,16 @@ public class RegistroConductor {
     private Timestamp horaInicio;
 
     private Timestamp horaFin;
+
+    public String getPatente() {
+        return this.patente;
+    }
+
+    public Timestamp getHoraInicio() {
+        return this.horaInicio;
+    }
+
+    public Timestamp getHoraFin() {
+        return this.horaFin;
+    }
 }

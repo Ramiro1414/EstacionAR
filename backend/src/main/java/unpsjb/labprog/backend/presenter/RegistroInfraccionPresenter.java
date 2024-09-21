@@ -20,4 +20,11 @@ public class RegistroInfraccionPresenter {
     public ResponseEntity<Object> findAll() {
         return Response.ok(service.findAll());
     }
+
+    @RequestMapping(value = "/cruzamiento",method=RequestMethod.GET)
+    public ResponseEntity<Object> cruzamiento() {
+        return Response.ok(service.cruzamiento(), "Proceso de cruzamiento de datos");
+    }
+
+
 }
