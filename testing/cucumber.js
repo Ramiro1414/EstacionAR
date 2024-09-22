@@ -1,3 +1,3 @@
 module.exports = {
-   default: `--format-options '{"snippetInterface": "synchronous"}'`
- }
+  default: `--require features/step_definitions/*.js --format-options '{"snippetInterface": "synchronous"}'`
+}

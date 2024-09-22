@@ -1,23 +1,25 @@
+@media (max-width: 768px) {
+  .white-div {
+    top: 70px;
+  }
+}
+
 .header {
   height: 60px;
   display: flex;
   background: linear-gradient(to bottom, #2c2c2c, #006a6a);
   align-items: center;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 2;
 }
-
 .logo {
-  display: flex;
-  align-items: center;
-}
-
-.logo-link {
-  text-decoration: none;
-  color: #04dfdf;
-}
-
-.logo-link h3 {
-  margin: 0;
-  margin-right: 5px;
+  width: 150px;
+  height: 46px;
+  background-image: url('../assets/logo-color.png');
+  opacity: 97%;
+  background-size: cover;
   margin-left: 10px;
 }
 
@@ -52,7 +54,9 @@
   border-top-right-radius: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   overflow-y: auto;
+
 }
+
 
 .white-div::-webkit-scrollbar {
   width: 10px;
