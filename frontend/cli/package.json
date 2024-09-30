@@ -21,6 +21,7 @@
     "bootstrap": "^5.3.3",
     "font-awesome": "^4.7.0",
     "leaflet": "^1.9.4",
+    "leaflet-draw": "^1.0.4",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.10"
@@ -29,6 +30,7 @@
     "@angular-devkit/build-angular": "^18.2.4",
     "@angular/cli": "^18.2.4",
     "@angular/compiler-cli": "^18.2.0",
+    "@types/leaflet-draw": "^1.0.11",
     "typescript": "~5.5.2"
   }
 }

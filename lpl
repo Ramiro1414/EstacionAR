@@ -51,9 +51,11 @@ case "$1" in
   test ) echo "Testing"
     docker compose run --rm testing
     ;;
-  staging ) echo "Cargando staging $2"
-    cat ./staging/$2.sql | docker exec -i database psql -q -U APP -d labprog
+  staging )
+    echo "Cargando staging $2"
+    PGPASSWORD='m1&p5swd' psql -h if012estm.fi.mdn.unp.edu.ar -p 28001 -U dbuser -d ddbb1 -f ./staging/$2.sql
     ;;
+
   * ) echo "Opción inválida."
       ;;
 esac
