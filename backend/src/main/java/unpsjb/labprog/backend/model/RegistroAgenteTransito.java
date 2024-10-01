@@ -39,4 +39,12 @@ public class RegistroAgenteTransito {
     public Timestamp getHoraRegistro() {
         return this.horaRegistro;
     }
+
+    public double getLatitud() {
+        return this.latitud;
+    }
+
+    public double getLongitud() {
+        return this.longitud;
+    }
 }

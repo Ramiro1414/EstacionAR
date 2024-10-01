@@ -1,5 +1,6 @@
 package unpsjb.labprog.backend.business;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -22,6 +23,12 @@ public class RegistroConductorService {
         return result;
     }
 
+    public List<RegistroConductor> findByPatente(String patente) {
+        List<RegistroConductor> result = new ArrayList<>();
+        repository.findByPatente(patente).forEach(e -> result.add(e));
+        return result;
+    }
+    
     public List<RegistroConductor> findAllOrderByPatenteAsc() {
         
         List<RegistroConductor> result = new ArrayList<>();
@@ -40,5 +47,34 @@ public class RegistroConductorService {
 
     public RegistroConductor findById(int id) { 
         return repository.findById(id).orElse(null);
+    }
+
+    public boolean registroConductorExiste(String patente) {
+
+        List<RegistroConductor> registrosConductores = this.findAllOrderByPatenteAsc();
+
+        for (RegistroConductor r : registrosConductores) {
+            if (r.getPatente().equals(patente)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    public RegistroConductor encontrarRegistroConductorParaElGrupo(String patente, Timestamp horaMin, Timestamp horaMax) {     
+    // Timestamp encontrar registros de esa patente que el horaMax este despues del inicio y el horaMin este antes del fin
+
+    List<RegistroConductor> registrosConductor = (List<RegistroConductor>) repository.findAll();
+
+    for (RegistroConductor r : registrosConductor) {
+        if (r.getPatente().equals(patente)) {
+            if (horaMax.after(r.getHoraInicio()) && horaMin.before(r.getHoraFin())) {
+                return r;
+            }
+        }
+    }
+
+    return null;
     }
 }

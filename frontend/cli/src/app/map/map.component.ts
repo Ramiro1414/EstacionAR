@@ -50,7 +50,8 @@ export class MapComponent implements AfterViewInit {
           shapeOptions: {
             color: '#ff0000', // Color de la línea
             weight: 4, // Grosor de la línea
-            clickable: true
+            clickable: true,
+            fill : true
           }
         },
         polygon: false,

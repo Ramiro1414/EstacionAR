@@ -5,15 +5,17 @@
 }
 
 .header {
-  height: 60px;
+  height: 70px;
   display: flex;
-  background: linear-gradient(to bottom, #2c2c2c, #006a6a);
+  background: linear-gradient(to bottom, #2c2c2c, #00859a);
+  /* background: linear-gradient(to bottom, #2c2c2c, #005c68, #009bafee, #0092a500); */
   align-items: center;
   position: fixed;
   top: 0;
   width: 100%;
   z-index: 2;
 }
+
 .logo {
   width: 150px;
   height: 46px;

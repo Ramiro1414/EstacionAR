@@ -1,7 +1,6 @@
 package unpsjb.labprog.backend.business;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,9 @@ import unpsjb.labprog.backend.model.RegistroAgenteTransito;
 @Service
 public class RegistroAgenteTransitoService {
     
+    // Constante que define la maxima diferencia que se permite al comparar las ubicaciones de registros de agentes de transito
+    public static int MAXIMA_DIFERENCIA_DISTANCIA = 5;
+
     @Autowired
     RegistroAgenteTransitoRepository repository;
 
@@ -25,13 +27,8 @@ public class RegistroAgenteTransitoService {
     /** Retorna una lista de registros de agentes de transito ordenada por patentes en orden ascendente */
     public List<RegistroAgenteTransito> findAllOrderByPatenteAsc() {
         
-        List<RegistroAgenteTransito> result = new ArrayList<>();
-        
-        repository.findAll().forEach(result::add);
-        
-        result.sort(Comparator.comparing(RegistroAgenteTransito::getPatente));
-    
-        return result;
+        return repository.getRegistrosObleistaPorPatente();
+
     }
 
     /** Retorna un booleano en funcion de si una patente fue registrada o no por los agentes de transito */
@@ -63,6 +60,39 @@ public class RegistroAgenteTransitoService {
 
         return result;
     }
+
+    // public List<List<RegistroAgenteTransito>> agruparPorUbicacionRegistroAgentesTransito(List<RegistroAgenteTransito> registrosAgenteTransito) {
+    
+    // List<List<RegistroAgenteTransito>> result;
+    // boolean termina = false;
+    // RegistroAgenteTransito first;
+    // List<RegistroAgenteTransito> group;
+    // double distancia = 0;
+
+    // while(!termina) {
+    //     first = registrosAgenteTransito.get(0);
+    //     group = null;
+    //     for(RegistroAgenteTransito r : registrosAgenteTransito) {
+
+    //         double[] coordenadaA = {r.getLatitud(), r.getLongitud()};
+    //         double[] coordenadaA = {r.getLatitud(), r.getLongitud()};
+
+    //         distancia = Haversine.distanciaEntrePuntos(coordenadaA, coordenadaB);
+
+    //         if(distancia <= MAXIMA_DIFERENCIA_DISTANCIA) {
+    //             group.add(r);
+    //             registrosAgenteTransito.remove(r);
+    //         }
+
+    //     }
+
+    //     result.add(group);
+
+    //     if (registrosAgenteTransito.isEmpty()) { termina = true; }
+    // }
+
+    // return result;
+    // }
 
     @Transactional
     public RegistroAgenteTransito save(RegistroAgenteTransito e){

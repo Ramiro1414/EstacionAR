@@ -22,14 +22,7 @@ public class RegistroInfraccion {
     @ManyToOne
     private RegistroAgenteTransito registroAgenteTransito;
 
-    @ManyToOne
-    private RegistroConductor registroConductor;
-
     public void setRegistroAgenteTransito(RegistroAgenteTransito rat) {
         this.registroAgenteTransito = rat;
-    }
-
-    public void setRegistroConductor(RegistroConductor rc) {
-        this.registroConductor = rc;
     }
 }
