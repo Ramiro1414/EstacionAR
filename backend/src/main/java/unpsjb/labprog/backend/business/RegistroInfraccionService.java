@@ -13,10 +13,9 @@ import unpsjb.labprog.backend.model.RegistroAgenteTransito;
 import unpsjb.labprog.backend.model.RegistroConductor;
 import unpsjb.labprog.backend.model.RegistroInfraccion;
 
-
 @Service
 public class RegistroInfraccionService {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(RegistroInfraccionService.class);
 
     @Autowired
@@ -26,23 +25,26 @@ public class RegistroInfraccionService {
     @Autowired
     RegistroConductorService registroConductorService;
 
-        public List<RegistroInfraccion> findAll(){
+    public List<RegistroInfraccion> findAll() {
         List<RegistroInfraccion> result = new ArrayList<>();
         repository.findAll().forEach(e -> result.add(e));
         return result;
     }
 
     @Transactional
-    public RegistroInfraccion save(RegistroInfraccion e){
+    public RegistroInfraccion save(RegistroInfraccion e) {
         return repository.save(e);
     }
 
-    public RegistroInfraccion findById(int id) { 
+    public RegistroInfraccion findById(int id) {
         return repository.findById(id).orElse(null);
     }
 
-    /** Proceso que realiza el cruzamiento de registros de agentes de tránsito y registros de 
-    conductores para determinar si estos últimos cometieron alguna infraccion o no.*/
+    /**
+     * Proceso que realiza el cruzamiento de registros de agentes de tránsito y
+     * registros de conductores para determinar si estos últimos cometieron
+     * alguna infraccion o no.
+     */
     /*
     @Transactional
     public List<RegistroInfraccion> cruzamiento() {
@@ -78,11 +80,8 @@ public class RegistroInfraccionService {
         return result;
 
     }
-    */
-
-
-    
-    /*
+     */
+ /*
      * conseguir todos los reg de agentes de transito de un dia ordenados por patente
      * 
      * agruparlos por la patente de cada uno (es decir en la primer iteracion se recorren los reg AT de la patente1 luego patente2 etc)
@@ -94,7 +93,62 @@ public class RegistroInfraccionService {
      * 
      * (no tomar en cuenta ubicacion - hacer luego)
      * 
-    */
+     */
+    @Transactional
+    public List<RegistroInfraccion> cruzamientoNuevo() {
+        List<RegistroInfraccion> result = new ArrayList<>();
+
+        List<RegistroAgenteTransito> registrosAgenteTransitoMezclados = registroAgenteTransitoService.findAllOrderByPatenteAsc();
+        /* registrosAgenteTransitoMezclados es una lista de los RO ordenados por patente, pero son todas las patentes en todas las ubicaciones */
+        for (List<RegistroAgenteTransito> grupoRegistrosAgenteTransitoDeUnaPatente : agruparPorPatente(registrosAgenteTransitoMezclados)) {
+            boolean hayInfraccion = false;
+            /* agruparPorPatente devuelve una lista de listas de RO. Es una lista de los registros de cada patente, y los registros de cada patente es otra lista*/
+            String patenteActual = grupoRegistrosAgenteTransitoDeUnaPatente.get(0).getPatente();
+            /* tomo el primero, puede ser cualquiera porque pertenecen a una patente en comun*/
+            for (List<RegistroAgenteTransito> grupoRegistrosAgenteTransitoPorUbicacion : agruparPorUbicacion(grupoRegistrosAgenteTransitoDeUnaPatente)) {
+                /* agruparPorUbicacion devuelve una lista de los registros de cada ubicacion que estaciono esa patent, y los registros de cada ubicacion es otra lista */
+                List<RegistroConductor> registrosConductores = registroConductorService.findByPatente(patenteActual);
+                /* Conseguir los RC de esa patente */
+                for (RegistroConductor rc : registrosConductores) {
+                    /* Probar con cada RC */
+                    for (RegistroAgenteTransito r : grupoRegistrosAgenteTransitoPorUbicacion) {
+                        /* Para cada RO se comprobará si comete infraccion en el RC actual */
+                        if (!(r.getHoraRegistro().after(rc.getHoraInicio()) && r.getHoraRegistro().before(rc.getHoraFin()))) {
+                            //comete infraccion
+                            RegistroInfraccion nuevaInfraccion = new RegistroInfraccion();
+                            nuevaInfraccion.setRegistroAgenteTransito(r);
+                            this.save(nuevaInfraccion);
+                            result.add(nuevaInfraccion);
+                            hayInfraccion = true;
+                            //pensar mejor la condicion de corte, deberia ignorar los demas registros (¿cuales?)
+                            break;
+                        }
+                        if (hayInfraccion) {
+                            break;              //no importan los demas registros de esa misma ubicacion
+                        }
+                    }
+                    if (hayInfraccion) {
+                        break;                  //no importan los demas registros de conductor porque ya hay infraccion para esa patente
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public List<List<RegistroAgenteTransito>> agruparPorPatente(List<RegistroAgenteTransito> registrosAgenteTransitoMezclados) {
+        List<List<RegistroAgenteTransito>> result = new ArrayList<List<RegistroAgenteTransito>>();
+
+        return result;
+    }
+
+    public List<List<RegistroAgenteTransito>> agruparPorUbicacion(List<RegistroAgenteTransito> registrosAgenteTransitoDeUnaPatente) {
+        List<List<RegistroAgenteTransito>> result = new ArrayList<List<RegistroAgenteTransito>>();
+
+        return result;
+    }
+
     @Transactional
     public List<RegistroInfraccion> cruzamiento() {
 
@@ -102,15 +156,15 @@ public class RegistroInfraccionService {
 
         List<RegistroAgenteTransito> registrosAgenteTransito = registroAgenteTransitoService.findAllOrderByPatenteAsc();
 
-        String currentPatente = null; 
-        
+        String currentPatente = null;
+
         boolean multaRealizada = false;
 
         boolean cometeInfraccion = false;
 
         for (RegistroAgenteTransito r : registrosAgenteTransito) {
 
-            if (!r.getPatente().equals(currentPatente)) { 
+            if (!r.getPatente().equals(currentPatente)) {
                 currentPatente = r.getPatente();
                 multaRealizada = false;
                 cometeInfraccion = false;
@@ -121,8 +175,8 @@ public class RegistroInfraccionService {
 
             if (!multaRealizada) { // Si no se le realizó una multa a esa patente
 
-                if (!registroConductorService.registroConductorExiste(r.getPatente())) { 
-                    
+                if (!registroConductorService.registroConductorExiste(r.getPatente())) {
+
                     RegistroInfraccion nuevaInfraccion = new RegistroInfraccion();
                     nuevaInfraccion.setRegistroAgenteTransito(r);
                     this.save(nuevaInfraccion);
@@ -130,17 +184,17 @@ public class RegistroInfraccionService {
                     multaRealizada = true;
 
                 } else { // Evaluo si cometió infraccion iterando sobre los registros de conductores
-                    
+
                     cometeInfraccion = true;
 
                     for (RegistroConductor rc : registrosConductores) {
-                        
-                        if ( r.getHoraRegistro().after(rc.getHoraInicio()) && r.getHoraRegistro().before(rc.getHoraFin()) ) {
+
+                        if (r.getHoraRegistro().after(rc.getHoraInicio()) && r.getHoraRegistro().before(rc.getHoraFin())) {
                             cometeInfraccion = false;
                             break;
                         }
                     }
-                    
+
                     if (cometeInfraccion) {
                         RegistroInfraccion nuevaInfraccion = new RegistroInfraccion();
                         nuevaInfraccion.setRegistroAgenteTransito(r);

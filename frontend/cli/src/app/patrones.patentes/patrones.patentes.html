@@ -1,0 +1,42 @@
+
+<h2 class="my-4">Nuestros patrones de patentes</h2>
+<a href="patrones/patentes/new">
+  <div class="my-3">
+    <button class="btn btn-success">Nuevo
+      patrón</button>
+  </div>
+</a>
+<div class="table-responsive">
+  <table class="table table-striped table-sm">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Patron</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let patronPatente of resultsPage.content; index as i">
+        <td style="width: 20%">{{ ((currentPage - 1)*ITEMS_PER_PAGE) + (i + 1)
+          }}</td>
+        <td style="width: 40%;">{{ patronPatente.expresionRegularPatente }}</td>
+        <td style="width: 5%;">
+          <a routerLink="/patrones/patentes/{{patronPatente.id}}"><i
+              class="fa fa-pencil mx-2"></i></a>
+          <a (click)="remove(patronPatente.id)"
+            routerLink="/patrones/patentes"><i class="fa fa-trash"></i></a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div>
+    <tfoot>
+      <app-pagination
+        [totalPages]="resultsPage.totalPages"
+        [currentPage]="currentPage"
+        (pageChangeRequested)="onPageChangeRequested($event)"
+        [number]="resultsPage.number"
+        [hidden]="resultsPage.numberOfElements < 1"></app-pagination>
+    </tfoot>
+  </div>
+</div>
