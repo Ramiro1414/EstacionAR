@@ -3,14 +3,14 @@ import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { PaginationComponent } from '../pagination/pagination.component';
 import { ResultsPage } from '../results-page';
-import { PatronesPatentesService} from './patrones.patentes.service';
+import { PatronesPatentesService } from './patrones.patentes.service';
 import { ModalService } from '../modal/modal.service';
 
 @Component({
   selector: 'app-patrones.patentes',
   standalone: true,
   imports: [CommonModule, RouterModule, PaginationComponent],
-  templateUrl: `patrones.patentes.html`,
+  templateUrl: `patrones.patentes.component.html`,
   styles: ``
 })
 export class PatronesPatentesComponent {
@@ -20,9 +20,9 @@ export class PatronesPatentesComponent {
   ITEMS_PER_PAGE: number = 10;
 
   constructor(
-    private service : PatronesPatentesService,
+    private service: PatronesPatentesService,
     private modalService: ModalService
-  ){}
+  ) { }
 
   ngOnInit() {
     this.getPatronesPatentes();
@@ -30,14 +30,16 @@ export class PatronesPatentesComponent {
 
   getPatronesPatentes(): void {
     this.service.byPage(this.currentPage, this.ITEMS_PER_PAGE).subscribe(
-      (dataPackage) => {  this.resultsPage = <ResultsPage>dataPackage.data; }
+      (dataPackage) => {
+        this.resultsPage = <ResultsPage>dataPackage.data;
+      }
     );
   }
 
-  remove(id: number){
+  remove(id: number) {
     let that = this;
     this.modalService.confirm(
-      "Eliminar patron de patente",
+      "Eliminar patrón de patente",
       "¿Está seguro que desea eliminar el patrón de patente?",
       "Si elimina el cliente no podrá revertir esta acción."
     ).then(
@@ -48,7 +50,7 @@ export class PatronesPatentesComponent {
               "Error",
               "Error al borrar el patrón de patentes.",
               dataPackage.message
-            )
+            );
           }
           that.getPatronesPatentes();
         });
@@ -60,4 +62,25 @@ export class PatronesPatentesComponent {
     this.currentPage = page;
     this.getPatronesPatentes();
   }
+
+  traducirExpresionRegular(regex: string): string {
+    // Lógica de traducción de la expresión regular
+    const patrones = [
+      { regex: /\[A-Z\]\{(\d+)\}/g, descripcion: '$1 letras mayúsculas ' },
+      { regex: /\\d\{(\d+)\}/g, descripcion: '$1 dígitos ' }, // Captura dígitos con repeticiones
+      { regex: /\\d/g, descripcion: '1 dígito ' }, // Captura un dígito sin repeticiones
+      { regex: /\[A-Z\]/g, descripcion: '1 letra mayúscula ' },
+    ];
+
+    let descripcion = regex;
+
+    // Reemplazar según los patrones
+    patrones.forEach(patron => {
+      descripcion = descripcion.replace(patron.regex, patron.descripcion);
+    });
+
+    // Limpia espacios extra y corrige cualquier carácter adicional
+    return descripcion.replace(/\s+/g, ' ').replace(/\\/, '').trim();
+  }
+
 }

@@ -1,0 +1,64 @@
+<div *ngIf="poligono">
+    <h2 class="my-4" *ngIf="nuevo">Nuevo poligono de estacionamiento</h2>
+    <h2 class="my-4" *ngIf="!nuevo">Editar poligono de estacionamiento</h2>
+    <h4 *ngIf="!nuevo">Editando: Poligono N.° {{ poligono.id }}</h4>
+    
+    <form #form="ngForm">
+        <div class="form.group">
+            <label for="nombre">Nombre del poligono de estacionamiento:</label>
+            <input name="nombre" 
+                   placeholder="Nombre" 
+                   class="form-control" 
+                   [(ngModel)]="poligono.nombre" 
+                   required 
+                   #nombre="ngModel" 
+                   pattern="[a-zA-Z0-9 ]*"
+                   style="width: 50%;">
+                   
+            <div *ngIf="nombre.invalid && (nombre.dirty || nombre.touched)" class="text-danger">
+                <div *ngIf="nombre.errors?.['required']">
+                    El nombre del poligono de estacionamiento es requerido.
+                </div>
+                <div *ngIf="nombre.errors?.['pattern']">
+                    El nombre solo puede contener letras, números y espacios.
+                </div>
+            </div>
+        </div>
+    </form>    
+
+    <label for="name">Precio por hora de estacionamiento:</label>
+        <input 
+        name="precio" 
+        placeholder="precio" 
+        class="form-control" 
+        style="width: 30%;" 
+        [(ngModel)]="poligono.precio" 
+        required 
+        #precio="ngModel" 
+        type="number" 
+        min="0">
+
+        <!-- Mensaje de error si el valor es inválido -->
+    <div *ngIf="precio.invalid && precio.touched" class="text-danger">
+        <div *ngIf="precio.errors?.['required']">El campo es obligatorio (solo puede ingresar numeros).</div>
+        <div *ngIf="precio.errors?.['min']">El precio debe ser un número positivo.</div>
+    </div>
+
+    <form #form="ngForm">
+        <!-- Botones de acción -->
+        <div class="d-flex flex-row align-items-center justify-content-end my-3">
+            <div>
+                <button (click)="goBack()" class="btn btn-danger">Atrás</button>
+            </div>
+            <div class="mx-4">
+                <button (click)="save()" [disabled]="!form.valid || polylinesList.length === 0 || precio.invalid" class="btn btn-success">Guardar</button>
+                <br>
+                <br>
+                <button (click)="printPolylines()" class="btn btn-success">Print</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Aquí agregamos el contenedor del mapa -->
+    <div id="map" class="map-container"></div>
+</div>

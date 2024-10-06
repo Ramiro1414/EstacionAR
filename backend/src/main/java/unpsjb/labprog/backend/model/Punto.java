@@ -21,4 +21,5 @@ public class Punto {
     private double latitud;
     
     private double longitud;
+
 }

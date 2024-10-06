@@ -1,5 +1,6 @@
 package unpsjb.labprog.backend.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,12 +20,10 @@ public class LineaPoligono {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Punto punto1;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Punto punto2;
 
-    @ManyToOne
-    private Poligono poligono;
 }

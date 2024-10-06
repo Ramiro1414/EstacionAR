@@ -1,0 +1,44 @@
+
+<h2 class="my-4">Poligonos de estacionamiento</h2>
+<a href="poligonos/new">
+  <div style="display: inline-flex; margin-bottom: 1%;">
+    <button class="btn btn-success">Nuevo poligono</button>
+  </div>
+</a>
+<div class="table-responsive">
+  <table class="table table-striped table-sm">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Numero</th>
+        <th>Nombre</th>
+        <th>Precio por hora de estacionamiento</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let poligono of resultsPage.content; index as i">
+        <td style="width: 20%">{{ ((currentPage - 1)*ITEMS_PER_PAGE) + (i + 1) }}</td>
+        <td style="width: 20%;">{{ poligono.id }}</td>
+        <td style="width: 30%;">{{ poligono.nombre }}</td>
+        <td style="width: 40%">$ {{ poligono.precio }}</td>
+        <td style="width: 5%;">
+          <a routerLink="/poligonos/{{poligono.id}}"><i
+              class="fa fa-pencil mx-2"></i></a>
+          <a (click)="remove(poligono.id)"
+             routerLink="/poligonos"><i class="fa fa-trash"></i></a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div>
+    <tfoot>
+      <app-pagination
+        [totalPages]="resultsPage.totalPages"
+        [currentPage]="currentPage"
+        (pageChangeRequested)="onPageChangeRequested($event)"
+        [number]="resultsPage.number"
+        [hidden]="resultsPage.numberOfElements < 1"></app-pagination>
+    </tfoot>
+  </div>
+</div>

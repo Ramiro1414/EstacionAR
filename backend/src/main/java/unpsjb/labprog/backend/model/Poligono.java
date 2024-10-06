@@ -1,9 +1,13 @@
 package unpsjb.labprog.backend.model;
 
+import java.util.Collection;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,4 +23,9 @@ public class Poligono {
     private int id;
 
     private double precio;
+
+    private String nombre;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private Collection<LineaPoligono> lineasPoligono;
 }

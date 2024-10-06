@@ -26,6 +26,7 @@ import 'leaflet-draw/dist/leaflet.draw.css'; // Importa los estilos
 export class MapComponent implements AfterViewInit {
   private map!: L.Map; // Definir el tipo de mapa
   private drawnItems!: L.FeatureGroup; // Grupo para las líneas dibujadas
+  private updatedArray: any[] = []; // Array que se actualizará con las coordenadas
 
   ngAfterViewInit(): void {
     // Inicializa el mapa
@@ -51,10 +52,15 @@ export class MapComponent implements AfterViewInit {
             color: '#ff0000', // Color de la línea
             weight: 4, // Grosor de la línea
             clickable: true,
-            fill : true
+            fill: true
           }
         },
-        polygon: false,
+        polygon: {
+          shapeOptions: {
+            color: '#0000ff', // Color de la línea del polígono
+            fillOpacity: 0.5 // Opacidad del relleno del polígono
+          }
+        },
         rectangle: false,
         circle: false, // Desactiva la opción de dibujar círculos
         circlemarker: false, // Desactiva la opción de dibujar marcadores circulares
@@ -70,19 +76,58 @@ export class MapComponent implements AfterViewInit {
       this.drawnItems.addLayer(layer);
 
       // Obtener y mostrar las coordenadas de la línea dibujada
-      if (layer instanceof L.Polyline) {
-        const latLngs = layer.getLatLngs();
-
-        if (Array.isArray(latLngs)) {
-          for (let i = 0; i < latLngs.length; i += 2) {
-            const start = latLngs[i] as L.LatLng;
-            const end = latLngs[i + 1] ? (latLngs[i + 1] as L.LatLng) : null;
-            if (end) {
-              console.log(`Puntos: Inicio: (${start.lat}, ${start.lng}); Fin: (${end.lat}, ${end.lng})`);
-            }
-          }
-        }
+      if (layer instanceof L.Polyline || layer instanceof L.Polygon) {
+        this.updateArrayWithCoordinates(layer);
       }
     });
+
+    // Escuchar el evento de edición de polilínea o polígono
+    this.map.on(L.Draw.Event.EDITED, (event) => {
+      const editEvent = event as L.DrawEvents.Edited;
+      const layers = editEvent.layers;
+
+      layers.eachLayer((layer: L.Layer) => {
+        // Asegúrate de que el layer sea de tipo L.Polyline o L.Polygon
+        if (layer instanceof L.Polyline || layer instanceof L.Polygon) {
+          this.updateArrayWithCoordinates(layer);
+        }
+      });
+    });
+  }
+
+  private updateArrayWithCoordinates(layer: L.Polyline | L.Polygon): void {
+    const latLngs = layer.getLatLngs();
+
+    // Comprobar si latLngs es un array
+    if (Array.isArray(latLngs)) {
+      this.updatedArray = []; // Limpiar el array antes de actualizar
+
+      // Si es un array de arrays (en el caso de un polígono)
+      latLngs.forEach(latLngArray => {
+        // Verificar si latLngArray es un array
+        if (Array.isArray(latLngArray)) {
+          latLngArray.forEach(point => {
+            if (point instanceof L.LatLng) {
+              this.updatedArray.push({ lat: point.lat, lng: point.lng });
+            }
+          });
+        } else if (latLngArray instanceof L.LatLng) {
+          // Si es un solo punto
+          this.updatedArray.push({ lat: latLngArray.lat, lng: latLngArray.lng });
+        }
+      });
+
+      // Imprimir el array actualizado
+      console.log('Array actualizado:', this.updatedArray);
+
+      // Aquí puedes hacer la request al backend con el array actualizado si es necesario
+      // this.sendToBackend(this.updatedArray);
+    }
+  }
+
+  // Método para enviar al backend (implementación necesaria)
+  private sendToBackend(data: any[]): void {
+    // Implementa tu lógica de envío al servidor
+    console.log('Enviando datos al backend:', data);
   }
 }

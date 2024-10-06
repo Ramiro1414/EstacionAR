@@ -1,7 +1,7 @@
 
 <h2 class="my-4">Nuestros patrones de patentes</h2>
 <a href="patrones/patentes/new">
-  <div class="my-3">
+  <div style="display: inline-flex; margin-bottom: 1%;">
     <button class="btn btn-success">Nuevo
       patrón</button>
   </div>
@@ -12,14 +12,15 @@
       <tr>
         <th>#</th>
         <th>Patron</th>
+        <th>Nombre</th>
         <th></th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let patronPatente of resultsPage.content; index as i">
-        <td style="width: 20%">{{ ((currentPage - 1)*ITEMS_PER_PAGE) + (i + 1)
-          }}</td>
-        <td style="width: 40%;">{{ patronPatente.expresionRegularPatente }}</td>
+        <td style="width: 20%">{{ ((currentPage - 1)*ITEMS_PER_PAGE) + (i + 1)  }}</td>
+        <td style="width: 40%;">{{ traducirExpresionRegular(patronPatente.expresionRegularPatente) }}</td>
+        <td style="width: 20%">{{ patronPatente.nombre }}</td>
         <td style="width: 5%;">
           <a routerLink="/patrones/patentes/{{patronPatente.id}}"><i
               class="fa fa-pencil mx-2"></i></a>

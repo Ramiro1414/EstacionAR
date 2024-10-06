@@ -18,5 +18,7 @@ public class PatronPatente {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
+    private String nombre;
+
     private String expresionRegularPatente;
 }

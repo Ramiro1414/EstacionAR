@@ -1,6 +1,7 @@
 package unpsjb.labprog.backend.business;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -17,6 +18,8 @@ import unpsjb.labprog.backend.model.RegistroInfraccion;
 public class RegistroInfraccionService {
 
     private static final Logger logger = LoggerFactory.getLogger(RegistroInfraccionService.class);
+
+    private static final double DISTANCIA_ENTRE_UBICACIONES_MAXIMA = 5.0;
 
     @Autowired
     RegistroInfraccionRepository repository;
@@ -96,39 +99,40 @@ public class RegistroInfraccionService {
      */
     @Transactional
     public List<RegistroInfraccion> cruzamientoNuevo() {
+
         List<RegistroInfraccion> result = new ArrayList<>();
 
         List<RegistroAgenteTransito> registrosAgenteTransitoMezclados = registroAgenteTransitoService.findAllOrderByPatenteAsc();
         /* registrosAgenteTransitoMezclados es una lista de los RO ordenados por patente, pero son todas las patentes en todas las ubicaciones */
         for (List<RegistroAgenteTransito> grupoRegistrosAgenteTransitoDeUnaPatente : agruparPorPatente(registrosAgenteTransitoMezclados)) {
-            boolean hayInfraccion = false;
             /* agruparPorPatente devuelve una lista de listas de RO. Es una lista de los registros de cada patente, y los registros de cada patente es otra lista*/
             String patenteActual = grupoRegistrosAgenteTransitoDeUnaPatente.get(0).getPatente();
             /* tomo el primero, puede ser cualquiera porque pertenecen a una patente en comun*/
             for (List<RegistroAgenteTransito> grupoRegistrosAgenteTransitoPorUbicacion : agruparPorUbicacion(grupoRegistrosAgenteTransitoDeUnaPatente)) {
                 /* agruparPorUbicacion devuelve una lista de los registros de cada ubicacion que estaciono esa patent, y los registros de cada ubicacion es otra lista */
+
+                for (RegistroAgenteTransito r : grupoRegistrosAgenteTransitoPorUbicacion) {
+                    System.out.println("id " + r.getId() + " patente " + r.getPatente());
+                }
+                System.out.println("--");
+
                 List<RegistroConductor> registrosConductores = registroConductorService.findByPatente(patenteActual);
                 /* Conseguir los RC de esa patente */
-                for (RegistroConductor rc : registrosConductores) {
-                    /* Probar con cada RC */
-                    for (RegistroAgenteTransito r : grupoRegistrosAgenteTransitoPorUbicacion) {
-                        /* Para cada RO se comprobará si comete infraccion en el RC actual */
-                        if (!(r.getHoraRegistro().after(rc.getHoraInicio()) && r.getHoraRegistro().before(rc.getHoraFin()))) {
-                            //comete infraccion
-                            RegistroInfraccion nuevaInfraccion = new RegistroInfraccion();
-                            nuevaInfraccion.setRegistroAgenteTransito(r);
-                            this.save(nuevaInfraccion);
-                            result.add(nuevaInfraccion);
-                            hayInfraccion = true;
-                            //pensar mejor la condicion de corte, deberia ignorar los demas registros (¿cuales?)
+                for (RegistroAgenteTransito r : grupoRegistrosAgenteTransitoPorUbicacion) {
+                    boolean hayInfraccion = true;
+                    /* Para cada RO se comprobará si comete infraccion en el RC actual */
+                    for (RegistroConductor rc : registrosConductores) {
+                        /* Probar con cada RC */
+                        if (r.getHoraRegistro().after(rc.getHoraInicio()) && r.getHoraRegistro().before(rc.getHoraFin())) {
+                            hayInfraccion = false;
                             break;
-                        }
-                        if (hayInfraccion) {
-                            break;              //no importan los demas registros de esa misma ubicacion
                         }
                     }
                     if (hayInfraccion) {
-                        break;                  //no importan los demas registros de conductor porque ya hay infraccion para esa patente
+                        RegistroInfraccion nuevaInfraccion = new RegistroInfraccion();
+                        nuevaInfraccion.setRegistroAgenteTransito(r);
+                        this.save(nuevaInfraccion);
+                        result.add(nuevaInfraccion);
                     }
                 }
             }
@@ -137,14 +141,98 @@ public class RegistroInfraccionService {
         return result;
     }
 
+    /* retorna una lista de listas de registros de agente de transito. Es una lista de los registros de cada patente, y los registros de cada patente es otra lista */
     public List<List<RegistroAgenteTransito>> agruparPorPatente(List<RegistroAgenteTransito> registrosAgenteTransitoMezclados) {
-        List<List<RegistroAgenteTransito>> result = new ArrayList<List<RegistroAgenteTransito>>();
+
+        List<List<RegistroAgenteTransito>> result = new ArrayList<>();
+
+        if (registrosAgenteTransitoMezclados.isEmpty()) { // devuelve una lista vacia si no hay registros de agente de transito
+            return result;
+        }
+
+        String currentPatente = null; // variable utilizada para reconocer cuando aparece un registro con una nueva patente
+        List<RegistroAgenteTransito> registrosAgenteTransito = new ArrayList<>();
+
+        for (RegistroAgenteTransito rat : registrosAgenteTransitoMezclados) {
+            String patenteRegistro = rat.getPatente(); // obtenemos la patente
+
+            if (patenteRegistro == null || !patenteRegistro.equals(currentPatente)) { // verifica si la patente es diferente o null
+
+                if (currentPatente != null) { // salvamos el primer caso, para no agregar una lista vacia
+                    result.add(registrosAgenteTransito);
+                }
+
+                currentPatente = patenteRegistro; // asigno la patente de los registros
+                registrosAgenteTransito = new ArrayList<>();
+            }
+
+            if (currentPatente != null) {
+                registrosAgenteTransito.add(rat); // agregamos el registro a la lista de la patente actual
+            }
+        }
+
+        if (!registrosAgenteTransito.isEmpty()) { // agregar la última lista de registros
+            result.add(registrosAgenteTransito);
+        }
 
         return result;
     }
 
+    /* agruparPorUbicacion devuelve una lista de los registros de cada ubicacion que estaciono esa patent, y los registros de cada ubicacion es otra lista */
+ /* 
+     * grupoDeUBActual = grupoDeUB1;
+     * 
+     * while (!registrosAgenteTransitoDeUnaPatente.isEmpty()){
+     *  anterior = registrosAgenteTransitoDeUnaPatente.get(0);
+     *  for (actual : registrosAgenteTransitoDeUnaPatente){
+     *      if(circle(anterior, actual)){
+     *          grupoDeUBActual.add(actual);
+     *          registrosAgenteTransitoDeUnaPatente.remove(actual); 
+     *      } 
+     *      anterior = actual;
+     *  }
+     *  result.add(grupoDeUBActual)
+     *  grupoDeUBActual = new ArrayList();
+     * }
+     */
     public List<List<RegistroAgenteTransito>> agruparPorUbicacion(List<RegistroAgenteTransito> registrosAgenteTransitoDeUnaPatente) {
-        List<List<RegistroAgenteTransito>> result = new ArrayList<List<RegistroAgenteTransito>>();
+        List<List<RegistroAgenteTransito>> result = new ArrayList<>();
+
+        if (registrosAgenteTransitoDeUnaPatente.isEmpty()) {
+            return result;
+        }
+
+        List<Boolean> agrupado = new ArrayList<>(Collections.nCopies(registrosAgenteTransitoDeUnaPatente.size(), false));
+
+        for (int i = 0; i < registrosAgenteTransitoDeUnaPatente.size(); i++) {
+            if (agrupado.get(i)) {
+                continue;
+            }
+
+            RegistroAgenteTransito referencia = registrosAgenteTransitoDeUnaPatente.get(i);
+            List<RegistroAgenteTransito> grupoDeRegistrosUbicacionActual = new ArrayList<>();
+            grupoDeRegistrosUbicacionActual.add(referencia);
+            agrupado.set(i, true); // Marcamos el registro actual como agrupado
+
+            // Recorremos toda la lista para agrupar los registros con la misma ubicación exacta
+            for (int j = 0; j < registrosAgenteTransitoDeUnaPatente.size(); j++) {
+                if (agrupado.get(j)) {
+                    continue;
+                }
+
+                RegistroAgenteTransito actual = registrosAgenteTransitoDeUnaPatente.get(j);
+
+                // Comparamos las ubicaciones exactamente
+                if (Double.compare(referencia.getLatitud(), actual.getLatitud()) == 0
+                        && Double.compare(referencia.getLongitud(), actual.getLongitud()) == 0) {
+                    grupoDeRegistrosUbicacionActual.add(actual);
+                    agrupado.set(j, true); // Marcamos como agrupado
+                }
+            }
+
+            // Añadimos el grupo formado a la lista de resultados
+            result.add(grupoDeRegistrosUbicacionActual);
+        }
 
         return result;
     }
