@@ -133,6 +133,7 @@ public class RegistroInfraccionService {
                         nuevaInfraccion.setRegistroAgenteTransito(r);
                         this.save(nuevaInfraccion);
                         result.add(nuevaInfraccion);
+                        break;
                     }
                 }
             }
