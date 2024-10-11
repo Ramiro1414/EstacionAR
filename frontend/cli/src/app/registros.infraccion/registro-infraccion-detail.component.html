@@ -1,0 +1,59 @@
+<div *ngIf="registroAgenteTransito">
+    <h2 class="my-4" >Viendo registro de agente de transito N.° {{ registroAgenteTransito.id}}</h2>
+    
+    <form #form="ngForm">
+        <div class="form.group">
+            <label for="patente">Patente</label>
+            <input name="patente" 
+                   placeholder="Patente" 
+                   class="form-control" 
+                   [(ngModel)]="registroAgenteTransito.patente" 
+                   required 
+                   #nombre="ngModel" 
+                   style="width: 50%;"
+                   disabled="true"> 
+            
+           <label for="latitud">Precio por hora de estacionamiento:</label>
+           <input name="horaRegistro" 
+                placeholder="Hora del registro" 
+                class="form-control" 
+                style="width: 50%;" 
+                [(ngModel)]="registroAgenteTransito.horaRegistro"
+                required 
+                disabled="true"
+                #horaRegistro="ngModel">
+
+            <label for="latitud">Latitud:</label>
+            <input name="latitud" 
+                    placeholder="Latitud" 
+                    class="form-control" 
+                    style="width: 50%;" 
+                    [(ngModel)]="registroAgenteTransito.latitud"
+                    required 
+                    disabled="true"
+                    #latitud="ngModel">
+                    
+            <label for="longitud">Longitud:</label>
+            <input name="longitud" 
+                    placeholder="Longitud" 
+                    class="form-control" 
+                    style="width: 50%;" 
+                    [(ngModel)]="registroAgenteTransito.longitud"
+                    required 
+                    disabled="true"
+                    #latitud="ngModel">
+        </div>
+    </form>    
+
+    <form #form="ngForm">
+        <!-- Botones de acción -->
+        <div class="d-flex flex-row align-items-center justify-content-end my-3">
+            <div>
+                <button (click)="goBack()" class="btn btn-danger">Atrás</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Aquí agregamos el contenedor del mapa -->
+    <div id="map" class="map-container"></div>
+</div>

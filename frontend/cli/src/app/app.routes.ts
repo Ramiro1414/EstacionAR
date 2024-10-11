@@ -5,6 +5,8 @@ import { PatronesPatentesComponent } from './patrones.patentes/patrones.patentes
 import { PatronesPatentesDetailComponent } from './patrones.patentes/patrones.patentes.detail.component';
 import { PoligonosComponent } from './poligonos/poligonos.component'
 import { PoligonosDetailComponent } from './poligonos/poligonos-detail.component';
+import { RegistrosInfraccionComponent } from './registros.infraccion/registros.infraccion.component';
+import { RegistroInfraccionDetailComponent } from './registros.infraccion/registro-infraccion-detail.component';
 
 export const routes: Routes = [
     {path: '', component: HomeComponent},
@@ -12,5 +14,7 @@ export const routes: Routes = [
     {path: 'patrones/patentes', component: PatronesPatentesComponent},
     {path: 'patrones/patentes/:id', component: PatronesPatentesDetailComponent},
     {path: 'poligonos', component: PoligonosComponent},
-    {path: 'poligonos/:id', component: PoligonosDetailComponent}
+    {path: 'poligonos/:id', component: PoligonosDetailComponent},
+    {path: 'registros-infracciones', component: RegistrosInfraccionComponent},
+    {path: 'registros-infracciones/detalle/registro-agente-transito/id/:id', component: RegistroInfraccionDetailComponent}
 ];

@@ -1,0 +1,39 @@
+
+<h2 class="my-4">Registros de infracciones</h2>
+<div class="table-responsive">
+  <table class="table table-striped table-sm">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>N.°</th>
+        <th>Patente</th>
+        <th>Hora de registro</th>
+        <th>Ubicacion</th>
+        <th>Detalle</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let registroInfraccion of resultsPage.content; index as i">
+        <td >{{ ((currentPage - 1)*ITEMS_PER_PAGE) + (i + 1)  }}</td>
+        <td >{{ registroInfraccion.id }}</td>
+        <td >{{ registroInfraccion.registroAgenteTransito.patente }}</td>
+        <td>{{ registroInfraccion.registroAgenteTransito.horaRegistro | date: 'dd/MM/yyyy, h:mm a' }}</td>
+        <td>{{ registroInfraccion.registroAgenteTransito.latitud }}, {{ registroInfraccion.registroAgenteTransito.longitud }}</td>
+        <td>
+          <a routerLink="/registros-infracciones/detalle/registro-agente-transito/id/{{registroInfraccion.registroAgenteTransito.id}}"><i class="fa fa-eye"></i></a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div>
+    <tfoot>
+      <app-pagination
+        [totalPages]="resultsPage.totalPages"
+        [currentPage]="currentPage"
+        (pageChangeRequested)="onPageChangeRequested($event)"
+        [number]="resultsPage.number"
+        [hidden]="resultsPage.numberOfElements < 1"></app-pagination>
+    </tfoot>
+  </div>
+</div>

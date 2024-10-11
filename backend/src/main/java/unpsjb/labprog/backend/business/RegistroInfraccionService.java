@@ -7,6 +7,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -41,6 +44,10 @@ public class RegistroInfraccionService {
 
     public RegistroInfraccion findById(int id) {
         return repository.findById(id).orElse(null);
+    }
+
+    public Page<RegistroInfraccion> findByPage(int page, int size, Sort sort) {
+        return repository.findAll(PageRequest.of(page, size, sort));
     }
 
     /**

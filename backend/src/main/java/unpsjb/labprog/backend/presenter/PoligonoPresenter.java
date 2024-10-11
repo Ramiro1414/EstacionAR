@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import unpsjb.labprog.backend.Response;
 import unpsjb.labprog.backend.business.PoligonoService;
-import unpsjb.labprog.backend.model.PatronPatente;
 import unpsjb.labprog.backend.model.Poligono;
 import unpsjb.labprog.backend.model.PoligonoDTO;
 
