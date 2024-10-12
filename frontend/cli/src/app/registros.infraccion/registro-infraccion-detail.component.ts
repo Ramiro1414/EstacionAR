@@ -1,4 +1,4 @@
-import { CommonModule, UpperCasePipe } from '@angular/common';
+import { CommonModule, formatDate, UpperCasePipe } from '@angular/common';
 import { Component, AfterViewInit, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -24,6 +24,8 @@ export class RegistroInfraccionDetailComponent implements AfterViewInit, OnInit,
   registroAgenteTransito!: RegistroAgenteTransito;
   map!: L.Map; // Variable para el mapa
   imageUrl: string | null = null; // Propiedad para almacenar la URL de la imagen
+  ubicacion: string = "";
+  horaRegistroFormateado: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -51,10 +53,13 @@ export class RegistroInfraccionDetailComponent implements AfterViewInit, OnInit,
 
   get(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    this.service.getDetalleRegistroAgenteTransito(parseInt(id!)).subscribe((dataPackage) => {
+    this.service.getDetalleRegistroAgenteTransito(parseInt(id!)).subscribe(async (dataPackage) => {
         console.log('Data Package:', dataPackage); // Log para verificar la respuesta completa
-        this.registroAgenteTransito = <RegistroAgenteTransito>dataPackage.data;
 
+        this.registroAgenteTransito = <RegistroAgenteTransito>dataPackage.data;
+        
+        this.horaRegistroFormateado = formatDate(this.registroAgenteTransito.horaRegistro, 'dd/MM/yyyy, h:mm a', 'en-US');
+        
         // Verifica si el campo 'foto' es una cadena y lo convierte a Blob
         if (typeof this.registroAgenteTransito.foto === 'string') {
             const base64String = this.registroAgenteTransito.foto.replace(/^data:image\/(png|jpeg);base64,/, ""); // Asegúrate de que la cadena esté limpia
@@ -69,6 +74,7 @@ export class RegistroInfraccionDetailComponent implements AfterViewInit, OnInit,
             console.warn('No se recibió un Blob en foto');
         }
 
+        this.ubicacion = await this.service.obtenerUbicacion(this.registroAgenteTransito.latitud, this.registroAgenteTransito.longitud);
         this.initMap();
     });
   }

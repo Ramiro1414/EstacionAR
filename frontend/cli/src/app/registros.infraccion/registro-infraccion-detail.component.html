@@ -13,35 +13,22 @@
                    style="width: 50%;"
                    disabled="true"> 
             
-           <label for="latitud">Precio por hora de estacionamiento:</label>
+           <label for="horaRegistro">Hora del registro</label>
            <input name="horaRegistro" 
                 placeholder="Hora del registro" 
                 class="form-control" 
                 style="width: 50%;" 
-                [(ngModel)]="registroAgenteTransito.horaRegistro"
+                [value]="horaRegistroFormateado"
                 required 
-                disabled="true"
-                #horaRegistro="ngModel">
+                disabled="true">
 
-            <label for="latitud">Latitud:</label>
-            <input name="latitud" 
-                    placeholder="Latitud" 
-                    class="form-control" 
-                    style="width: 50%;" 
-                    [(ngModel)]="registroAgenteTransito.latitud"
-                    required 
-                    disabled="true"
-                    #latitud="ngModel">
-                    
-            <label for="longitud">Longitud:</label>
-            <input name="longitud" 
-                    placeholder="Longitud" 
-                    class="form-control" 
-                    style="width: 50%;" 
-                    [(ngModel)]="registroAgenteTransito.longitud"
-                    required 
-                    disabled="true"
-                    #latitud="ngModel">
+            <label for="ubicacion">Ubicacion</label>
+            <input name="ubicacion" 
+                placeholder="Ubicación" 
+                class="form-control" 
+                style="width: 100%;" 
+                [(ngModel)]="ubicacion" 
+                disabled="true">
             
             <br>
             <label for="fotografia">Fotografia:</label>

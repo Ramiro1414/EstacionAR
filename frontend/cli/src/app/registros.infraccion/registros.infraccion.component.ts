@@ -28,17 +28,26 @@ export class RegistrosInfraccionComponent {
     this.getRegistrosInfraccion();
   }
 
+  onPageChangeRequested(page: number): void {
+    this.currentPage = page;
+    this.getRegistrosInfraccion();
+  }
+
+  async obtenerUbicaciones(): Promise<void> {
+    for (let registroInfraccion of this.resultsPage.content) {
+      const latitud = registroInfraccion.registroAgenteTransito.latitud;
+      const longitud = registroInfraccion.registroAgenteTransito.longitud;
+      registroInfraccion.ubicacion = await this.service.obtenerUbicacion(latitud, longitud);
+    }
+  }
+  
   getRegistrosInfraccion(): void {
     this.service.byPage(this.currentPage, this.ITEMS_PER_PAGE).subscribe(
       (dataPackage) => {
         this.resultsPage = <ResultsPage>dataPackage.data;
+        this.obtenerUbicaciones(); // Obtener ubicaciones para los registros cargados
       }
     );
-  }
-
-  onPageChangeRequested(page: number): void {
-    this.currentPage = page;
-    this.getRegistrosInfraccion();
   }
 
 }

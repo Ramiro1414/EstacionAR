@@ -19,7 +19,7 @@
         <td >{{ registroInfraccion.id }}</td>
         <td >{{ registroInfraccion.registroAgenteTransito.patente }}</td>
         <td>{{ registroInfraccion.registroAgenteTransito.horaRegistro | date: 'dd/MM/yyyy, h:mm a' }}</td>
-        <td>{{ registroInfraccion.registroAgenteTransito.latitud }}, {{ registroInfraccion.registroAgenteTransito.longitud }}</td>
+        <td>{{ registroInfraccion.ubicacion || 'Cargando ubicación...' }}</td>
         <td>
           <a routerLink="/registros-infracciones/detalle/registro-agente-transito/id/{{registroInfraccion.registroAgenteTransito.id}}"><i class="fa fa-eye"></i></a>
         </td>

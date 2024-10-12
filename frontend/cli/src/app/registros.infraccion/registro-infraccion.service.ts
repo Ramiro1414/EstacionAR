@@ -2,13 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DataPackage } from '../data-package';
+import axios from 'axios';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RegistroInfraccionService {
   private url = 'rest/registros-infracciones';
-  private apiUrl = `https://nominatim.openstreetmap.org/reverse`;
 
   constructor(
     private http: HttpClient
@@ -26,7 +26,21 @@ export class RegistroInfraccionService {
     return this.http.get<DataPackage>(`${this.url}/page?page=${page - 1}&size=${size}`);
   }
 
-  getAddressFromCoordinates(lat: number, lng: number) {
-    return this.http.get(`${this.apiUrl}?lat=${lat}&lon=${lng}&format=json`);
-  }
+  async obtenerUbicacion(latitud: number, longitud: number): Promise<string> {
+    try {
+        const response = await axios.get('https://nominatim.openstreetmap.org/reverse', {
+            params: {
+                lat: latitud,
+                lon: longitud,
+                format: 'json',
+            }
+        });
+
+        return response.data.address.road + (response.data.address.house_number ? " " + response.data.address.house_number : "");
+    } catch (error) {
+        console.error('Error obteniendo la ubicación:', error);
+        return 'Ubicación no disponible';
+    }
+}
+
 }
