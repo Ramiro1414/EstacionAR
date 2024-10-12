@@ -1,8 +1,8 @@
 export interface RegistroAgenteTransito {
     id: number;
-    patente: String;
+    patente: string;
     horaRegistro: Date;
     latitud: number;
     longitud: number;
-    foto: Blob;
+    foto: Blob | string;
 }

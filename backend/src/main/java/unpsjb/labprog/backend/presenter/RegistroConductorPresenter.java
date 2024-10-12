@@ -24,7 +24,7 @@ public class RegistroConductorPresenter {
     }
 
     @RequestMapping(value = "/recibir", method=RequestMethod.POST)
-    public ResponseEntity<Object> generarPedido(@RequestBody RegistroConductor unRegistroConductor) {
+    public ResponseEntity<Object> recibirRegistro(@RequestBody RegistroConductor unRegistroConductor) {
 
         return Response.ok(service.save(unRegistroConductor), "Registro de conductor recibido");
     }

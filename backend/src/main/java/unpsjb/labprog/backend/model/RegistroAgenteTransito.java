@@ -30,7 +30,7 @@ public class RegistroAgenteTransito {
     private double longitud;
 
     @Column(columnDefinition = "BYTEA")
-    private byte[] fotografia;
+    private byte[] foto;
 
     public String getPatente() {
         return this.patente;

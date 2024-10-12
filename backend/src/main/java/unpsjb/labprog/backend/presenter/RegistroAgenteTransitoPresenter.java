@@ -24,7 +24,7 @@ public class RegistroAgenteTransitoPresenter {
     }
 
     @RequestMapping(value = "/recibir", method=RequestMethod.POST)
-    public ResponseEntity<Object> generarPedido(@RequestBody RegistroAgenteTransito unRegistroAgenteTransito) {
+    public ResponseEntity<Object> recibirRegistro(@RequestBody RegistroAgenteTransito unRegistroAgenteTransito) {
 
         return Response.ok(service.save(unRegistroAgenteTransito), "Registro de agente de transito recibido");
     }

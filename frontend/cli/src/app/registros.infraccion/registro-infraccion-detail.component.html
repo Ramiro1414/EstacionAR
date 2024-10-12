@@ -42,8 +42,20 @@
                     required 
                     disabled="true"
                     #latitud="ngModel">
+            
+            <br>
+            <label for="fotografia">Fotografia:</label>
+            <br>
+            <img *ngIf="imageUrl" [src]="imageUrl" alt="Fotografía del registro" 
+            style="max-width: 50%; height: auto; border: 1px solid #ccc; margin-top: 10px;" />
+
         </div>
     </form>    
+
+    <!-- Aquí agregamos el contenedor del mapa -->
+    <br>
+    <label for="longitud">Ubicacion en el mapa:</label>
+    <div id="map" class="map-container"></div>
 
     <form #form="ngForm">
         <!-- Botones de acción -->
@@ -54,6 +66,4 @@
         </div>
     </form>
 
-    <!-- Aquí agregamos el contenedor del mapa -->
-    <div id="map" class="map-container"></div>
 </div>
