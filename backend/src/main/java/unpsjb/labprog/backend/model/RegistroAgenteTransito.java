@@ -29,6 +29,9 @@ public class RegistroAgenteTransito {
 
     private double longitud;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean verificado = false; // Valor por defecto
+
     @Column(columnDefinition = "BYTEA")
     private byte[] foto;
 

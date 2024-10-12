@@ -126,10 +126,13 @@ public class RegistroInfraccionService {
                 List<RegistroConductor> registrosConductores = registroConductorService.findByPatente(patenteActual);
                 /* Conseguir los RC de esa patente */
                 for (RegistroAgenteTransito r : grupoRegistrosAgenteTransitoPorUbicacion) {
+                    r.setVerificado(true);
                     boolean hayInfraccion = true;
                     /* Para cada RO se comprobará si comete infraccion en el RC actual */
                     for (RegistroConductor rc : registrosConductores) {
                         /* Probar con cada RC */
+                        rc.setVerificado(true);
+
                         if (r.getHoraRegistro().after(rc.getHoraInicio()) && r.getHoraRegistro().before(rc.getHoraFin())) {
                             hayInfraccion = false;
                             break;
@@ -140,6 +143,12 @@ public class RegistroInfraccionService {
                         nuevaInfraccion.setRegistroAgenteTransito(r);
                         this.save(nuevaInfraccion);
                         result.add(nuevaInfraccion);
+
+                        // termino de verificar los registros que faltan
+                        for (RegistroAgenteTransito rat : grupoRegistrosAgenteTransitoPorUbicacion) {
+                            rat.setVerificado(true);
+                        }
+
                         break;
                     }
                 }

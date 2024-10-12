@@ -14,7 +14,7 @@ public interface RegistroAgenteTransitoRepository extends CrudRepository<Registr
     // @Query(" SELECT r FROM RegistroObleista r WHERE r.patente = :patente AND FUNCTION('DATE', r.horaRegistro) = CURRENT_DATE ORDER BY r.horaRegistro")
     // List<RegistroAgenteTransito> getRegistrosObleistaPorPatente(@Param("patente") String patente);
 
-    @Query("SELECT r FROM RegistroAgenteTransito r ORDER BY r.patente asc, r.horaRegistro asc")
+    @Query("SELECT r FROM RegistroAgenteTransito r WHERE r.verificado = false ORDER BY r.patente asc, r.horaRegistro asc")
     List<RegistroAgenteTransito> getRegistrosObleistaPorPatente();
 
 }
