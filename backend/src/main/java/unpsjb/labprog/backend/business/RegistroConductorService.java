@@ -28,6 +28,14 @@ public class RegistroConductorService {
         repository.findByPatente(patente).forEach(e -> result.add(e));
         return result;
     }
+
+    public List<RegistroConductor> getRegistrosConductorConFechaHastaHoyNoVerificadosDeUnaPatente(String patente) {
+        return repository.getRegistrosConductorConFechaHastaHoyNoVerificadosDeUnaPatente(patente);
+    }
+
+    public List<RegistroConductor> getRegistrosConductorConFechaHastaHoyNoVerificados() {
+        return repository.getRegistrosConductorConFechaHastaHoyNoVerificados();
+    }
     
     public List<RegistroConductor> findAllOrderByPatenteAsc() {
         

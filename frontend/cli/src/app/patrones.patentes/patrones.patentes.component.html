@@ -1,4 +1,3 @@
-
 <h2 class="my-4">Nuestros patrones de patentes</h2>
 <a href="patrones/patentes/new">
   <div style="display: inline-flex; margin-bottom: 1%;">
@@ -13,19 +12,19 @@
         <th>#</th>
         <th>Patron</th>
         <th>Nombre</th>
+        <th>Ejemplo</th>
         <th></th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let patronPatente of resultsPage.content; index as i">
-        <td style="width: 20%">{{ ((currentPage - 1)*ITEMS_PER_PAGE) + (i + 1)  }}</td>
-        <td style="width: 40%;">{{ traducirExpresionRegular(patronPatente.expresionRegularPatente) }}</td>
+        <td style="width: 10%">{{ ((currentPage - 1)*ITEMS_PER_PAGE) + (i + 1)  }}</td>
+        <td style="width: 30%;">{{ traducirExpresionRegular(patronPatente.expresionRegularPatente) }}</td>
         <td style="width: 20%">{{ patronPatente.nombre }}</td>
+        <td style="width: 10%">{{ generarEjemploPatente(patronPatente.expresionRegularPatente) }}</td>
         <td style="width: 5%;">
-          <a routerLink="/patrones/patentes/{{patronPatente.id}}"><i
-              class="fa fa-pencil mx-2"></i></a>
-          <a (click)="remove(patronPatente.id)"
-            routerLink="/patrones/patentes"><i class="fa fa-trash"></i></a>
+          <a routerLink="/patrones/patentes/{{patronPatente.id}}"><i class="fa fa-pencil mx-2"></i></a>
+          <a (click)="remove(patronPatente.id)" routerLink="/patrones/patentes"><i class="fa fa-trash"></i></a>
         </td>
       </tr>
     </tbody>

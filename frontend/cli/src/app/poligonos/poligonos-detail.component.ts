@@ -5,16 +5,15 @@ import { PoligonoService } from './poligono.service';
 import { ModalService } from '../modal/modal.service';
 import { CommonModule, UpperCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import * as L from 'leaflet';  // Importar Leaflet
-import { PolylineData } from './polylineData';
-import { CustomPolyline } from './customPolyline';
-import { PoligonoDTO } from './poligonoDTO';
+import { Punto } from './punto';
+import * as L from 'leaflet';
+import 'leaflet-draw';
 
 @Component({
   selector: 'app-poligono-detail',
   standalone: true,
   imports: [UpperCasePipe, FormsModule, CommonModule],
-  templateUrl: `poligonos-detail.component.html`,
+  templateUrl: './poligonos-detail.component.html',
   styles: [`
     .map-container {
       height: 75vh; /* Ajusta la altura del mapa */
@@ -31,11 +30,10 @@ export class PoligonosDetailComponent implements AfterViewInit {
 
   poligono!: Poligono;
   nuevo: boolean = false;
-  private map!: L.Map; // Definir el tipo de mapa
-  private drawnItems!: L.FeatureGroup; // Grupo para las líneas dibujadas
-  polylinesList: PolylineData[] = []; // Inicializa el arreglo de polylines
-  originalPolylinesList: PolylineData[] = [];
-  private poligonoDTO!: PoligonoDTO;
+  puntos: Punto[] = [];
+  map!: L.Map;
+  mapInitialized: boolean = false;
+  drawnItems = new L.FeatureGroup(); // Crear el FeatureGroup globalmente
 
   constructor(
     private route: ActivatedRoute,
@@ -44,173 +42,92 @@ export class PoligonosDetailComponent implements AfterViewInit {
     private modalService: ModalService
   ) { }
 
+  ngAfterViewChecked(): void {
+    if (!this.mapInitialized) {
+      const mapContainer = document.getElementById('map');
+      if (mapContainer) {
+        this.initMap();
+        this.mapInitialized = true; // Marcamos que el mapa ya ha sido inicializado
+        if (this.puntos.length !== 0) {
+          this.dibujarPoligono(this.puntos);
+        }
+      }
+    }
+  }
+
   ngOnInit(): void {
     this.get();
   }
 
   ngAfterViewInit(): void {
-
-    const mapElement = document.getElementById('map');
-    if (mapElement && this.poligono && !this.map) {
-      this.initializeMap();
-    }
-
+    // El mapa no se inicializa aquí directamente
   }
 
-  initializeMap(): void {
-    this.map = L.map('map').setView([-42.77, -65.04], 13);
+  initMap(): void {
+    if (this.map) {
+      return; // Evitar inicializar el mapa más de una vez
+    }
 
+    const mapContainer = document.getElementById('map');
+    if (!mapContainer) {
+      console.error('Map container not found');
+      return;
+    }
+
+    this.map = L.map(mapContainer).setView([-42.77, -65.04], 13);
+
+    // Cargar una capa de mapa
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
+      maxZoom: 19,
+      attribution: '© OpenStreetMap'
     }).addTo(this.map);
 
-    this.drawnItems = new L.FeatureGroup();
+    // Añadir drawnItems al mapa
     this.map.addLayer(this.drawnItems);
 
+    // Configurar el control de dibujo
     const drawControl = new L.Control.Draw({
       edit: {
         featureGroup: this.drawnItems
       },
       draw: {
-        polyline: {
-          shapeOptions: {
-            color: '#ff0000',
-            weight: 4
-          }
-        },
-        polygon: false,
-        circle: false,
+        polygon: {},
+        polyline: false,
         rectangle: false,
-        marker: false,
-        circlemarker: false
+        circle: false,
+        marker: false
       }
     });
     this.map.addControl(drawControl);
 
-    this.map.on(L.Draw.Event.CREATED, (event) => {
-      const createdEvent = event as L.DrawEvents.Created;
-      const layer = createdEvent.layer;
+    // Evento al finalizar el dibujo de un polígono
+    this.map.on(L.Draw.Event.CREATED, (event: any) => {
+      const layer = event.layer;
+      this.drawnItems.addLayer(layer);
 
-      if (layer instanceof L.Polyline) {
-        const latLngs = layer.getLatLngs() as L.LatLng[];
-
-        if (latLngs.length > 2) {
-          this.map.removeLayer(layer);
-        } else {
-          this.drawnItems.addLayer(layer);
-          this.printCoordinates(layer);
-
-          if (latLngs.length === 2) {
-            const coordinates = [
-              latLngs[0].lat, latLngs[0].lng,
-              latLngs[1].lat, latLngs[1].lng
-            ];
-            const polylineData: PolylineData = {
-              id: (layer as unknown as CustomPolyline)._leaflet_id,
-              coords: coordinates
-            };
-            this.polylinesList.push(polylineData);
-          }
-        }
-      }
+      // Obtener los puntos del polígono
+      this.actualizarPuntos(layer);
     });
 
-    this.map.on(L.Draw.Event.EDITED, (event) => {
-      const editedEvent = event as L.DrawEvents.Edited;
-      const layers = editedEvent.layers;
-
-      layers.eachLayer((layer: L.Layer) => {
-        if (layer instanceof L.Polyline) {
-          const latLngs = layer.getLatLngs() as L.LatLng[];
-
-          if (latLngs.length === 2) {
-            for (let i = 0; i < this.polylinesList.length; i++) {
-              const polylineData = this.polylinesList[i];
-
-              if (polylineData.id === (layer as unknown as CustomPolyline)._leaflet_id) {
-                this.polylinesList[i].coords = [
-                  latLngs[0].lat, latLngs[0].lng,
-                  latLngs[1].lat, latLngs[1].lng
-                ];
-                break;
-              }
-            }
-          }
-        }
-      });
-    });
-
-    this.map.on(L.Draw.Event.DELETED, (event) => {
-      const deleteEvent = event as L.DrawEvents.Deleted;
-
-      deleteEvent.layers.eachLayer((layer: L.Layer) => {
-        this.polylinesList = this.polylinesList.filter(
-          (polylineData) => polylineData.id !== (layer as unknown as CustomPolyline)._leaflet_id
-        );
+    // Evento al editar un polígono existente
+    this.map.on(L.Draw.Event.EDITED, (event: any) => {
+      const layers = event.layers;
+      layers.eachLayer((layer: any) => {
+        // Actualizar los puntos del polígono editado
+        this.actualizarPuntos(layer);
       });
     });
   }
 
-  private printCoordinates(layer: L.Polyline | L.Polygon): void {
-    const latLngs = layer.getLatLngs();
-
-    // Comprobar si latLngs es un array
-    if (Array.isArray(latLngs)) {
-      latLngs.forEach(latLngArray => {
-        if (Array.isArray(latLngArray)) {
-          latLngArray.forEach(point => {
-            if (point instanceof L.LatLng) {
-              console.log(`Punto: (${point.lat}, ${point.lng})`);
-            }
-          });
-        } else if (latLngArray instanceof L.LatLng) {
-          console.log(`Punto: (${latLngArray.lat}, ${latLngArray.lng})`);
-        }
-      });
-    }
-  }
-
-  // Método para imprimir el array de polylines
-  printPolylines(): void {
-    console.log('Lista de polylines de dos puntos:', this.polylinesList);
-  }
-
-  initMap(): void {
-    const map = L.map('map').setView([-42.77, -65.04], 13);  // Usar coordenadas y zoom deseados
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-  }
-
-  goBack(): void {
-    this.router.navigate(['poligonos']);
-  }
-
-  save(): void {
-    this.poligonoDTO = <PoligonoDTO>{};
-    this.poligonoDTO.id = this.poligono.id;
-    this.poligonoDTO.nombre = this.poligono.nombre;
-    this.poligonoDTO.precio = this.poligono.precio;
-    this.poligonoDTO.polylinesList = this.polylinesList.map(polyline => ({
-      id: polyline.id,
-      coords: polyline.coords
+  actualizarPuntos(layer: any): void {
+    const latlngs = layer.getLatLngs()[0];
+    this.puntos = latlngs.map((latlng: L.LatLng, index: number) => ({
+      id: index + 1, // Mantener un ID secuencial
+      latitud: latlng.lat,
+      longitud: latlng.lng
     }));
 
-    console.log('Datos del polígono a enviar:', this.poligonoDTO);
-
-    this.service.save(this.poligonoDTO).subscribe({
-      next: (dataPackage) => {
-        this.poligonoDTO = <PoligonoDTO>dataPackage.data;
-        this.goBack();
-        this.modalService.confirm("Polígono guardado con éxito", "El polígono de estacionamiento se guardó correctamente.", "");
-        console.log('Guardado exitoso:', this.poligonoDTO);
-      },
-      error: (error) => {
-        console.error('Error al guardar el polígono:', error);
-        this.modalService.error("Error al guardar", "No se pudo guardar el polígono, revise los datos e intente nuevamente.", "");
-      }
-    });
+    console.log(this.puntos); // Verificar los puntos actualizados en la consola
   }
 
   get(): void {
@@ -220,37 +137,69 @@ export class PoligonosDetailComponent implements AfterViewInit {
       this.nuevo = true;
     } else {
       this.nuevo = false;
-      this.poligono = <Poligono>{};
-
-      // Obtener el polígono
       this.service.get(parseInt(id!)).subscribe((dataPackage) => {
         this.poligono = <Poligono>dataPackage.data;
-      });
-
-      // Obtener las polilíneas del polígono
-      this.service.getLineasPoligono(parseInt(id!)).subscribe((dataPackage) => {
-        this.poligonoDTO = <PoligonoDTO>dataPackage.data;
-        this.polylinesList = this.poligonoDTO.polylinesList;
-        console.log(this.polylinesList);
-
-        // Aquí llamas a la función para dibujar las polilíneas en el mapa
-        this.dibujarPolylines(this.polylinesList);
+        this.puntos = this.poligono.puntos;
+        if (this.mapInitialized) {
+          this.dibujarPoligono(this.puntos);
+        }
       });
     }
   }
 
-  // Función para dibujar polilíneas en el mapa
-  dibujarPolylines(polylines: PolylineData[]): void {
-    for (const polyline of polylines) {
-      // Asegúrate de que coords contiene dos pares de coordenadas
-      const coords: L.LatLngExpression[] = [
-        [polyline.coords[0], polyline.coords[1]], // Punto 1: [latitud, longitud]
-        [polyline.coords[2], polyline.coords[3]]  // Punto 2: [latitud, longitud]
-      ];
-
-      // Crear la polilínea en el mapa
-      L.polyline(coords, { color: '#ff0000', weight: 4, opacity: 0.5 }).addTo(this.map);
+  dibujarPoligono(puntos: Punto[]): void {
+    if (!this.map || !puntos || puntos.length === 0) {
+      return; // Si el mapa no está inicializado o no hay puntos, salir
     }
+
+    // Convertir los puntos (Punto[]) en un array de L.LatLng para Leaflet
+    const latLngs = puntos.map(punto => L.latLng(punto.latitud, punto.longitud));
+
+    // Crear el polígono con los puntos
+    const poligonoLayer = L.polygon(latLngs, { color: 'blue' });
+
+    // Agregar el polígono al FeatureGroup de edición
+    this.drawnItems.addLayer(poligonoLayer);
+
+    // Ajustar la vista del mapa para que se centre en el polígono
+    this.map.fitBounds(poligonoLayer.getBounds());
+  }
+  
+
+  goBack(): void {
+    this.router.navigate(['poligonos']);
   }
 
+  save(): void {
+
+    this.puntos.forEach(punto => {
+      punto.id = 0;
+    });
+
+    this.poligono.puntos = this.puntos;
+
+    this.service.save(this.poligono).subscribe(dataPackage => {
+      
+      console.log(this.poligono);
+
+      if (dataPackage.status != 200) {
+        this.modalService.error(
+          "Error",
+          "Error al guardar el poligono.",
+          dataPackage.message
+        );
+      } else if (dataPackage.status == 200) {
+        this.modalService.confirm(
+          "OK",
+          "Poligono de estacionamiento guardado correctamente.",
+          dataPackage.message
+        );
+        this.goBack();
+      }
+    });
+  }
+
+  print(): void {
+
+  }
 }

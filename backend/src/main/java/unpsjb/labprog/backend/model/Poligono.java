@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,6 +27,6 @@ public class Poligono {
 
     private String nombre;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private Collection<LineaPoligono> lineasPoligono;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Collection<Punto> puntos;
 }

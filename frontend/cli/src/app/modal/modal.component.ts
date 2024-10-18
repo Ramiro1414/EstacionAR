@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -15,9 +15,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
       <p>
         <strong>{{message}}</strong>
       </p>
-      <p *ngIf="description">
-        <strong>{{description}}</strong>
-      </p>
+      <div *ngIf="description" [innerHTML]="description"></div> <!-- Aquí se muestra la tabla -->
     </div>
     <div class="modal-footer">
       <button *ngIf="!errorModal" type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
@@ -27,12 +25,10 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   styles: ``
 })
 export class ModalComponent {
-
   constructor(public modal: NgbActiveModal) {}
 
-  title = "";
-  message = "";
-  description = "";
-  errorModal = false; // Indicador de modal de error
-
+  @Input() title = "";
+  @Input() message = "";
+  @Input() description = "";
+  @Input() errorModal = false; // Indicador de modal de error
 }

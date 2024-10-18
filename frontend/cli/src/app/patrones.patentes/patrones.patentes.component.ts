@@ -41,7 +41,7 @@ export class PatronesPatentesComponent {
     this.modalService.confirm(
       "Eliminar patrón de patente",
       "¿Está seguro que desea eliminar el patrón de patente?",
-      "Si elimina el cliente no podrá revertir esta acción."
+      "Si lo elimina no podrá revertir esta acción."
     ).then(
       function () {
         that.service.remove(id).subscribe((dataPackage) => {
@@ -64,23 +64,38 @@ export class PatronesPatentesComponent {
   }
 
   traducirExpresionRegular(regex: string): string {
-    // Lógica de traducción de la expresión regular
     const patrones = [
       { regex: /\[A-Z\]\{(\d+)\}/g, descripcion: '$1 letras mayúsculas ' },
-      { regex: /\\d\{(\d+)\}/g, descripcion: '$1 dígitos ' }, // Captura dígitos con repeticiones
-      { regex: /\\d/g, descripcion: '1 dígito ' }, // Captura un dígito sin repeticiones
+      { regex: /\\d\{(\d+)\}/g, descripcion: '$1 dígitos ' },
+      { regex: /\\d/g, descripcion: '1 dígito ' },
       { regex: /\[A-Z\]/g, descripcion: '1 letra mayúscula ' },
     ];
 
     let descripcion = regex;
 
-    // Reemplazar según los patrones
     patrones.forEach(patron => {
       descripcion = descripcion.replace(patron.regex, patron.descripcion);
     });
 
-    // Limpia espacios extra y corrige cualquier carácter adicional
     return descripcion.replace(/\s+/g, ' ').replace(/\\/, '').trim();
   }
 
+  // Método para generar un ejemplo basado en la expresión regular
+  generarEjemploPatente(regex: string): string {
+    let ejemplo = '';
+
+    // Detecta patrones de letras mayúsculas y dígitos, y los reemplaza por ejemplos
+    const letterPattern = /\[A-Z\]\{(\d+)\}/g;
+    const digitPattern = /\\d\{(\d+)\}/g;
+    const singleLetterPattern = /\[A-Z\]/g;
+    const singleDigitPattern = /\\d/g;
+
+    ejemplo = regex
+      .replace(letterPattern, (match, p1) => 'A'.repeat(parseInt(p1, 10))) // Reemplaza [A-Z]{x} por 'A' repetido x veces
+      .replace(digitPattern, (match, p1) => '9'.repeat(parseInt(p1, 10)))  // Reemplaza \d{x} por '9' repetido x veces
+      .replace(singleLetterPattern, 'A')  // Reemplaza [A-Z] por una 'A'
+      .replace(singleDigitPattern, '9');  // Reemplaza \d por un '9'
+
+    return ejemplo;
+  }
 }

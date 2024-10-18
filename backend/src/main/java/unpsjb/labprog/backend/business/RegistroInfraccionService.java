@@ -155,6 +155,15 @@ public class RegistroInfraccionService {
             }
         }
 
+        // Marcamos como verificado aquellos registros de conductor que no fueron analizados porque no hubo registro de agente de transito para esas patentes
+        // Importante: no cometen infraccion, solo los marcamos como verificados
+        List<RegistroConductor> registrosConductoresNoVerificados = new ArrayList<>();
+        registrosConductoresNoVerificados = registroConductorService.findAll();
+
+        for (RegistroConductor rc : registrosConductoresNoVerificados) {
+            rc.setVerificado(true);
+        }
+
         return result;
     }
 

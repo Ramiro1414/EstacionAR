@@ -7,31 +7,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
-import unpsjb.labprog.backend.model.LineaPoligono;
+import unpsjb.labprog.backend.model.HoraInicioHoraFin;
 
 @Service
-public class LineaPoligonoService {
-
-    @Autowired
-    LineaPoligonoRepository repository;
+public class HorariosDelDiaService {
     
-    public List<LineaPoligono> findAll() {
-        List<LineaPoligono> result = new ArrayList<>();
+    @Autowired
+    HorariosDelDiaRepository repository;
+
+    public List<HoraInicioHoraFin> findAll() {
+        List<HoraInicioHoraFin> result = new ArrayList<>();
         repository.findAll().forEach(e -> result.add(e));
         return result;
     }
 
-    public LineaPoligono findById(int id) {
+    public HoraInicioHoraFin findById(int id) {
         return repository.findById(id).orElse(null);
     }
 
     @Transactional
-    public LineaPoligono save(LineaPoligono unaLineaPoligono) {
-        return repository.save(unaLineaPoligono);
+    public HoraInicioHoraFin save(HoraInicioHoraFin aHoraInicioHoraFin) {
+        return repository.save(aHoraInicioHoraFin);
     }
 
     @Transactional
     public void delete(int id) {
         repository.deleteById(id);
     }
+    
 }

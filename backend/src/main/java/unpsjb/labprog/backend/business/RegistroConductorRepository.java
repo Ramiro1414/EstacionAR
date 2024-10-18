@@ -13,4 +13,10 @@ public interface RegistroConductorRepository extends CrudRepository<RegistroCond
     
     @Query("SELECT r FROM RegistroConductor r WHERE r.patente = ?1")
     List<RegistroConductor> findByPatente(String patente);
+
+    @Query("SELECT r FROM RegistroConductor r WHERE r.verificado = false")
+    List<RegistroConductor> getRegistrosConductorConFechaHastaHoyNoVerificados();
+
+    @Query("SELECT r FROM RegistroConductor r WHERE r.verificado = false AND r.patente = ?1")
+    List<RegistroConductor> getRegistrosConductorConFechaHastaHoyNoVerificadosDeUnaPatente(String patente);
 }

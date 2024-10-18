@@ -1,12 +1,13 @@
 package unpsjb.labprog.backend.model;
 
-import java.sql.Date;
-import java.sql.Timestamp;
+import java.util.Collection;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,11 +24,11 @@ public class HorarioEstacionamiento {
 
     private String nombre;
 
-    private Date fechaInicio;
+    // Solo día y mes, sin año
+    private String fechaInicio;
+    private String fechaFin;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private Collection<HoraInicioHoraFin> horariosDelDia;
     
-    private Date fechaFin;
-
-    private Timestamp horaInicio;
-
-    private Timestamp horaFin;
 }

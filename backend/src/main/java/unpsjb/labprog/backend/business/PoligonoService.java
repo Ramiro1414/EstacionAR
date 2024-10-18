@@ -1,7 +1,6 @@
 package unpsjb.labprog.backend.business;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
-import unpsjb.labprog.backend.model.LineaPoligono;
 import unpsjb.labprog.backend.model.Poligono;
-import unpsjb.labprog.backend.model.PoligonoDTO;
-import unpsjb.labprog.backend.model.PolylineData;
-import unpsjb.labprog.backend.model.Punto;
 
 @Service
 public class PoligonoService {
@@ -26,8 +21,6 @@ public class PoligonoService {
     PoligonoRepository repository;
     @Autowired
     PuntoRepository puntoRepository;
-    @Autowired
-    LineaPoligonoRepository lineaPoligonoRepository;
 
     public List<Poligono> findAll() {
         List<Poligono> result = new ArrayList<>();
@@ -53,6 +46,7 @@ public class PoligonoService {
         return repository.findAll(PageRequest.of(page, size, sort));
     }
 
+    /*
     public Poligono crearPoligono(PoligonoDTO poligonoDTO) {
 
         Poligono nuevoPoligono = new Poligono();
@@ -90,10 +84,13 @@ public class PoligonoService {
         return nuevoPoligono;
     }
 
+    */
+    
     /**
      * Retorna el id del poligono al que pertenece las coordenadas que se pasan como
      * parametro. Retorna -1 si no pertenece a ningun poligono
      */
+    /*
     public int dentroDePoligono(double[] coordenadas) {
 
         double latitud = coordenadas[0];
@@ -126,6 +123,7 @@ public class PoligonoService {
         return -1;
 
     }
+        */
 
     /** Método para calcular la distancia desde un punto a una línea */
     private double calcularDistanciaDesdePuntoALinea(double lat, double lon, double[] punto1, double[] punto2) {
@@ -152,6 +150,7 @@ public class PoligonoService {
         return distancia;
     }
 
+    /*
     public PoligonoDTO getPoligonoCompleto(int id) {
 
         PoligonoDTO nuevoPoligonoDTO = new PoligonoDTO();
@@ -190,4 +189,5 @@ public class PoligonoService {
 
         return nuevoPoligonoDTO;
     }
+        */
 }

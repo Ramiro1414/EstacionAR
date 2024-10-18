@@ -1,0 +1,93 @@
+<div *ngIf="horarioEstacionamiento">
+    <h2 class="my-4" *ngIf="nuevo">Nuevo horario de estacionamiento</h2>
+    <h2 class="my-4" *ngIf="!nuevo">Editar horario de estacionamiento</h2>
+    <h4>Editando: {{ horarioEstacionamiento.nombre }}</h4>
+
+    <form #form="ngForm" class="form-container">
+        <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input type="text" class="form-control" id="nombre"
+                style="width: 45%;" name="nombre"
+                [(ngModel)]="horarioEstacionamiento.nombre" required>
+        </div>
+
+        <!-- Fecha de inicio (mes y día en línea) -->
+        <div class="form-group">
+            <label for="fechaInicio">Fecha inicio:</label>
+            <div class="d-flex">
+                <select class="form-control mr-2" style="width: 20%;"
+                    [(ngModel)]="diaInicio" name="diaInicio" required>
+                    <option *ngFor="let dia of dias">{{ dia }}</option>
+                </select>
+                <select class="form-control" style="width: 25%;"
+                    [(ngModel)]="mesInicio" name="mesInicio" required>
+                    <option *ngFor="let mes of meses" [value]="mes.value">{{
+                        mes.name }}</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Fecha de fin (mes y día en línea) -->
+        <div class="form-group">
+            <label for="fechaFin">Fecha fin:</label>
+            <div class="d-flex">
+                <select class="form-control mr-2" style="width: 20%;"
+                    [(ngModel)]="diaFin" name="diaFin" required>
+                    <option *ngFor="let dia of dias">{{ dia }}</option>
+                </select>
+                <select class="form-control" style="width: 25%;"
+                    [(ngModel)]="mesFin" name="mesFin" required>
+                    <option *ngFor="let mes of meses" [value]="mes.value">{{
+                        mes.name }}</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Hora Inicio</th>
+                        <th>Hora Fin</th>
+                        <th>
+                            <button (click)="addHora()" [disabled]="!form.valid"
+                                class="btn btn-success">
+                                Agregar hora
+                            </button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let horaDia of horarioEstacionamiento.horariosDelDia; index as i">
+                        <td>{{i + 1}}</td>
+                        <td>
+                            <input type="time" name="horaInicio{{i}}" placeholder="Hora inicio..." [(ngModel)]="horaDia.horaInicio" class="form-control" required>
+                        </td>
+                        <td>
+                            <input type="time" name="horaFin{{i}}" placeholder="Hora fin..." [(ngModel)]="horaDia.horaFin" class="form-control" required>
+                        </td>
+                        <td style="width: 15%;">
+                            <button (click)="removeHora(horaDia)" class="btn btn-default">
+                                <i class="fa fa-remove"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+
+        <div
+            class="d-flex flex-row align-items-center justify-content-end my-3">
+            <div>
+                <button (click)="goBack()"
+                    class="btn btn-danger">Cancelar</button>
+            </div>
+            <div class="mx-4">
+                <button (click)="save()" [disabled]="!form.valid"
+                    class="btn btn-success">Guardar</button>
+            </div>
+        </div>
+    </form>
+</div>

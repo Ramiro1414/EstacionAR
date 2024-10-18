@@ -1,0 +1,42 @@
+<h2 class="my-4">Nuestros horarios de estacionamiento</h2>
+<a href="horarios/estacionamiento/new">
+  <div style="display: inline-flex; margin-bottom: 1%;">
+    <button class="btn btn-success">Nuevo horario</button>
+  </div>
+</a>
+<div class="table-responsive">
+  <table class="table table-striped table-sm">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Nombre</th>
+        <th>Fecha inicio</th>
+        <th>Fecha fin</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let horario of resultsPage.content; index as i">
+        <td style="width: 20%">{{ ((currentPage - 1)*ITEMS_PER_PAGE) + (i + 1)  }}</td>
+        <td style="width: 20%;">{{ horario.nombre }}</td>
+        <td>{{ getFechaLegible(horario.fechaInicio) }}</td>
+        <td>{{ getFechaLegible(horario.fechaFin) }}</td>
+        <td style="width: 6%;">
+          <a routerLink="/horarios/estacionamiento/{{horario.id}}"><i class="fa fa-pencil"></i></a>
+          <a (click)="remove(horario.id)" routerLink="/horarios/estacionamiento"><i class="fa fa-trash mx-2"></i></a>
+          <a (click)="showInfo(horario.id)" routerLink="/horarios/estacionamiento"><i class="fa fa-eye"></i></a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div>
+    <tfoot>
+      <app-pagination
+        [totalPages]="resultsPage.totalPages"
+        [currentPage]="currentPage"
+        (pageChangeRequested)="onPageChangeRequested($event)"
+        [number]="resultsPage.number"
+        [hidden]="resultsPage.numberOfElements < 1"></app-pagination>
+    </tfoot>
+  </div>
+</div>

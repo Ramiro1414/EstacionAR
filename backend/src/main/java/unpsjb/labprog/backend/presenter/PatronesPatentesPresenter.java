@@ -43,8 +43,8 @@ public class PatronesPatentesPresenter {
 
     @RequestMapping(value = "/id/{id}", method = RequestMethod.GET)
     public ResponseEntity<Object> findById(@PathVariable("id") int id) {
-        PatronPatente aCustomerOrNull = service.findById(id);
-        return (aCustomerOrNull != null) ? Response.ok(aCustomerOrNull)
+        PatronPatente aPatronPatente = service.findById(id);
+        return (aPatronPatente != null) ? Response.ok(aPatronPatente)
                 : Response.notFound("error");
     }
 

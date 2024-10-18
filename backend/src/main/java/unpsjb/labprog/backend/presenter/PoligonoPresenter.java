@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import unpsjb.labprog.backend.Response;
 import unpsjb.labprog.backend.business.PoligonoService;
 import unpsjb.labprog.backend.model.Poligono;
-import unpsjb.labprog.backend.model.PoligonoDTO;
 
 @RestController
 @RequestMapping("/poligonos")
@@ -34,6 +33,7 @@ public class PoligonoPresenter {
                 : Response.notFound("error");
     }
 
+    /*
     @RequestMapping(value = "/dentro-de-poligono/{latitud},{longitud}", method = RequestMethod.GET)
     public ResponseEntity<Object> dentroDePoligono(@PathVariable("latitud") double latitud, @PathVariable("longitud") double longitud) {
 
@@ -43,6 +43,7 @@ public class PoligonoPresenter {
 
         return Response.ok(service.dentroDePoligono(coords));
     }
+    */
 
     @RequestMapping(value = "/page", method = RequestMethod.GET)
     public ResponseEntity<Object> findByPage(
@@ -57,25 +58,28 @@ public class PoligonoPresenter {
         service.delete(id);
         return Response.ok("Poligono de estacionamiento " + id + " borrado con éxito.");
     }
-
+    
     @RequestMapping(method=RequestMethod.POST)
-    public ResponseEntity<Object> crearPoligono(@RequestBody PoligonoDTO poligonoDTO) {
-        return Response.ok(service.crearPoligono(poligonoDTO));
+    public ResponseEntity<Object> crearPoligono(@RequestBody Poligono poligono) {
+        return Response.ok(service.save(poligono));
     }
 
+    
     @RequestMapping(method = RequestMethod.PUT)
-    public ResponseEntity<Object> update(@RequestBody PoligonoDTO poligonoDTO) {
-        if (poligonoDTO.getId() <= 0) {
+    public ResponseEntity<Object> update(@RequestBody Poligono poligono) {
+        if (poligono.getId() <= 0) {
             return Response.error(
-                    poligonoDTO,
+                    poligono,
                     "error");
         }
-        service.delete(poligonoDTO.getId());
-        return Response.ok(service.crearPoligono(poligonoDTO));
+        service.delete(poligono.getId());
+        return Response.ok(service.save(poligono));
     }
-
+    
+        /*
     @RequestMapping(value = "/id/{id}/lineas-poligono", method=RequestMethod.GET)
     public ResponseEntity<Object> getPoligonoCompleto(@PathVariable("id") int id) {
         return Response.ok(service.getPoligonoCompleto(id));
     }
+        */
 }

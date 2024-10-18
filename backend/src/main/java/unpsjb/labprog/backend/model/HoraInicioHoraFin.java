@@ -1,11 +1,9 @@
 package unpsjb.labprog.backend.model;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,16 +12,14 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class LineaPoligono {
+public class HoraInicioHoraFin {
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    private Punto punto1;
+    private String horaInicio;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    private Punto punto2;
+    private String horaFin;
 
 }
